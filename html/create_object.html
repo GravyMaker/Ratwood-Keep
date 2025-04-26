@@ -111,8 +111,6 @@
 					{
 						continue;
 					}
-					filtered.push(objects[i]);
-					filterednames.push(objects_by_name[i]);
 				}
 				else
 				{
@@ -121,9 +119,9 @@
 					{
 						continue;
 					}
-					filtered.push(objects[i]);
-					filterednames.push(objects_by_name[i]);
 				}
+				filtered.push(objects[i]);
+				filterednames.push(objects_by_name[i]);
 			}
 			
 			populateList(filtered, filterednames, usenames);
