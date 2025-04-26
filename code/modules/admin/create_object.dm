@@ -39,9 +39,24 @@
 
 	if (!html_form)
 		var/objectjs = jointext(typesof(path), ";")
+
+		var/objectnames = null
+		var/list/object_name_list = list()
+		for (var/obj/object as anything in typesof(path))
+			// Null and empty names won't display; semicolon names will mess up the generated JS...
+			if (object.name && object.name != "" && object.name != ";")
+				object_name_list.Add(object.name)
+			else
+				// ...so display an appropriate "name" rather than removing the entry.
+				// We want these arrays to be the same length!
+				object_name_list.Add("(NO NAME)")
+		objectnames = jointext(object_name_list, ";")
+		objectnames = replacetext(objectnames, "\"", "\\\"") // Some names have quotation marks in them, so escape them...
+
 		html_form = file2text('html/create_object.html')
 		html_form = replacetext(html_form, "Create Object", "Create [path]")
 		html_form = replacetext(html_form, "null /* object types */", "\"[objectjs]\"")
+		html_form = replacetext(html_form, "null /* object names */", "\"[objectnames]\"")
 		create_object_forms[path] = html_form
 
 	user << browse(create_panel_helper(html_form), "window=qco[path];size=425x475")
