@@ -104,21 +104,15 @@
 			var i;
 			for (i in objects)
 			{
+				var caseInsensitiveItem
 				if (usenames)
-				{
-					var caseInsensitiveName = objects_by_name[i].toLowerCase();
-					if (caseInsensitiveName.search(old_search) < 0)
-					{
-						continue;
-					}
-				}
+					caseInsensitiveItem = objects_by_name[i].toLowerCase();
 				else
+					caseInsensitiveItem = objects[i].toLowerCase();
+				
+				if(caseInsensitiveItem.search(old_search) < 0)
 				{
-					var caseInsensitiveObject = objects[i].toLowerCase();
-					if(caseInsensitiveObject.search(old_search) < 0)
-					{
-						continue;
-					}
+					continue;
 				}
 				filtered.push(objects[i]);
 				filterednames.push(objects_by_name[i]);
