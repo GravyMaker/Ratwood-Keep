@@ -746,6 +746,7 @@
 				var/obj/effect/proc_holder/spell/spell = S
 				spell.updateButtonIcon()
 		qdel(GetComponent(/datum/component/rot))
+		src.restore_stat_snapshot()
 
 /mob/living/proc/remove_CC(should_update_mobility = TRUE)
 	SetStun(0, FALSE)

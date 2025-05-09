@@ -18,6 +18,7 @@
 	var/list/statindex = list()
 	var/datum/patron/patron = /datum/patron/godless
 	var/obj/statdata/tempskill = new()
+	var/datum/stat_snapshot/stat_snapshot = new()
 
 /mob/living/proc/init_faith()
 	set_patron(/datum/patron/godless)
@@ -166,6 +167,12 @@
 	if(STALUC > 10)
 		return prob((STALUC - 10) * multi)
 
+/mob/living/proc/take_stat_snapshot()
+	stat_snapshot.take_snapshot(src)
+
+/mob/living/proc/restore_stat_snapshot()
+	stat_snapshot.restore_snapshot(src)
+
 // Helper object, so we don't need to duplicate the stat change code for every stat...
 /obj/statdata
 	var/value
@@ -199,3 +206,126 @@
 
 	value = newamt
 	buffer = tempbuffer
+
+/datum/stat_snapshot
+	var/STASTR = 10
+	var/STAPER = 10
+	var/STAINT = 10
+	var/STACON = 10
+	var/STAEND = 10
+	var/STASPD = 10
+	var/STALUC = 10
+
+	var/BUFSTR = 0
+	var/BUFPER = 0
+	var/BUFINT = 0
+	var/BUFCON = 0
+	var/BUFEND = 0
+	var/BUFSPD = 0
+	var/BUFLUC = 0
+
+	var/obj/statdata/tempstat = new()
+	var/is_valid = FALSE
+
+/datum/stat_snapshot/proc/take_snapshot(mob/living/L)
+	// Backup ALL stats, including their buffers...
+	STASTR = L.STASTR
+	BUFSTR = L.BUFSTR
+
+	STAPER = L.STAPER
+	BUFPER = L.BUFPER
+
+	STAINT = L.STAINT
+	BUFINT = L.BUFINT
+
+	STACON = L.STACON
+	BUFCON = L.BUFCON
+
+	STAEND = L.STAEND
+	BUFEND = L.BUFEND
+
+	STASPD = L.STASPD
+	BUFSPD = L.BUFSPE
+
+	STALUC = L.STALUC
+	BUFLUC = L.BUFLUC
+
+	// Iterate over every status effect, and remove their effects on our cached stats -
+	// This is so we can restore them later and only reapply the effects which are still active...
+	for (var/datum/status_effect/effect in L.status_effects)
+		for (var/affectedstat in effect.effectedstats)
+			change_stat(affectedstat, -effect.effectedstats[affectedstat])
+
+	// And now we can restore from it whenever we want...
+	is_valid = TRUE
+
+/datum/stat_snapshot/proc/restore_snapshot(mob/living/L)
+	if (!is_valid)
+		return
+
+	// First, iterate over all our remaining status conditions, and re-apply them...
+	for (var/datum/status_effect/effect in L.status_effects)
+		for (var/affectedstat in effect.effectedstats)
+			change_stat(affectedstat, effect.effectedstats[affectedstat])
+
+	// Now our cached values should be correct, so let's reapply them...
+	L.STASTR = STASTR
+	L.BUFSTR = BUFSTR
+
+	L.STAPER = STAPER
+	L.BUFPER = BUFPER
+
+	L.STAINT = STAINT
+	L.BUFINT = BUFINT
+
+	L.STACON = STACON
+	L.BUFCON = BUFCON
+
+	L.STAEND = STAEND
+	L.BUFEND = BUFEND
+
+	L.STASPD = STASPD
+	L.BUFSPE = BUFSPD
+
+	L.STALUC = STALUC
+	L.BUFLUC = BUFLUC
+
+	// Snapshot is no longer valid, now that we've restored it.
+	// In future, we could potentially change this - but for now let's keep it to one snapshot per mob.
+	is_valid = FALSE
+
+/datum/stat_snapshot/proc/change_stat(stat, amount)
+	if(!stat)
+		return
+	if(!amount)
+		return
+
+	switch(stat)
+		if("strength")
+			tempstat.modifystat(STASTR, BUFSTR, amount)
+			STASTR = tempstat.value
+			BUFSTR = tempstat.buffer
+		if("perception")
+			tempstat.modifystat(STAPER, BUFPER, amount)
+			STAPER = tempstat.value
+			BUFPER = tempstat.buffer
+		if("intelligence")
+			tempstat.modifystat(STAINT, BUFINT, amount)
+			STAINT = tempstat.value
+			BUFINT = tempstat.buffer
+		if("constitution")
+			tempstat.modifystat(STACON, BUFCON, amount)
+			STACON = tempstat.value
+			BUFCON = tempstat.buffer
+		if("endurance")
+			tempstat.modifystat(STAEND, BUFEND, amount)
+			STAEND = tempstat.value
+			BUFEND = tempstat.buffer
+		if("speed")
+			tempstat.modifystat(STASPD, BUFSPD, amount)
+			STASPD = tempstat.value
+			BUFSPD = tempstat.buffer
+		if("fortune")
+			tempstat.modifystat(STALUC, BUFLUC, amount)
+			STALUC = tempstat.value
+			BUFLUC = tempstat.buffer

@@ -38,6 +38,9 @@
 		SSdroning.kill_loop(client)
 		SSdroning.kill_rain(client)
 
+	// Back up our stats in case we're revived later on...
+	src.take_stat_snapshot()
+
 	if(mind)
 		if(!gibbed)
 			var/datum/antagonist/vampirelord/VD = mind.has_antag_datum(/datum/antagonist/vampirelord)
