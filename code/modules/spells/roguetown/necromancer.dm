@@ -420,6 +420,7 @@
 	ADD_TRAIT(src, TRAIT_TOXIMMUNE, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOSLEEP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_SHOCKIMMUNE, TRAIT_GENERIC)
+	swap_rmb_intent(null, rmb_intent) // Unlimited stamina, so reapply our intent to force us off Swift
 	update_body()
 
 	to_chat(src, span_userdanger("My master is [master.real_name]."))

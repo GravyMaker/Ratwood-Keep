@@ -105,6 +105,9 @@ GLOBAL_LIST_EMPTY(vampire_objects)
 		equip_lord()
 		addtimer(CALLBACK(owner.current, TYPE_PROC_REF(/mob/living/carbon/human, choose_name_popup), "VAMPIRE LORD"), 5 SECONDS)
 		greet()
+	
+	// We'll have unlimited stamina, so reapply our intent to force us off Swift
+	owner.current.swap_rmb_intent(null, owner.current.rmb_intent)
 	return ..()
 
 // OLD AND EDITED
